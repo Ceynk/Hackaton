@@ -1,0 +1,14 @@
+{
+  "name": "mente-sana-joven-hackaton-2026",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prototipo integrado para la Hackathon Villavicencio 2026 - Reto Mente Sana Joven",
+  "scripts": {
+    "instalar:todo": "npm --prefix backend install && npm --prefix frontend install",
+    "db:init": "npm --prefix backend run db:init",
+    "test:backend": "npm --prefix backend test",
+    "build:frontend": "npm --prefix frontend run build",
+    "iniciar:backend": "npm --prefix backend start",
+    "iniciar:frontend": "npm --prefix frontend run dev"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "mente-sana-joven-backend",
+  "version": "1.0.0",
+  "description": "API REST en Express y PostgreSQL para Mente Sana Joven - Hackathon Villavicencio 2026",
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js",
+    "dev": "node --watch servidor.js",
+    "db:init": "node scripts/inicializarBaseDatos.js",
+    "test": "node --test pruebas/api.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.17"
+  }
+}

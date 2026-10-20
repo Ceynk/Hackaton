@@ -1,0 +1,16 @@
+{
+  "name": "mente-sana-joven-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interfaz web en Next.js y React para Mente Sana Joven - Hackathon Villavicencio 2026",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000"
+  },
+  "dependencies": {
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
