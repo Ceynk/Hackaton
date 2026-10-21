@@ -63,7 +63,11 @@ aplicacion.use(
         origenSolicitud.startsWith("http://127.0.0.1:") ||
         origenSolicitud === "http://localhost" ||
         origenSolicitud === "http://127.0.0.1";
-      if (esOrigenLocal || origenesPermitidos.includes(origenSolicitud)) {
+      if (
+        origenesPermitidos.includes("*") ||
+        esOrigenLocal ||
+        origenesPermitidos.includes(origenSolicitud)
+      ) {
         return callback(null, true);
       }
       return callback(new Error("Origen no autorizado por la politica CORS"));
@@ -74,6 +78,14 @@ aplicacion.use(
 );
 aplicacion.use(express.json({ limit: "16kb" }));
 aplicacion.use(limitarSolicitudesPorMinuto);
+
+aplicacion.get("/", (solicitud, respuesta) => {
+  respuesta.json({
+    exito: true,
+    mensaje: "API Mente Sana Joven activa",
+    salud: "/api/salud"
+  });
+});
 
 aplicacion.use("/api/salud", rutasSalud);
 aplicacion.use("/api/categorias", rutasCategorias);

@@ -7,9 +7,9 @@ async function iniciarServidor() {
     await conexionBaseDatos.inicializarEsquemaYDatos();
     const estadoInicial = await conexionBaseDatos.obtenerEstadoBaseDatos();
 
-    aplicacion.listen(configuracionEntorno.puertoBackend, () => {
+    aplicacion.listen(configuracionEntorno.puertoBackend, "0.0.0.0", () => {
       process.stdout.write(
-        `Servidor Express activo en http://localhost:${configuracionEntorno.puertoBackend} (${estadoInicial.motor})\n`
+        `Servidor Express activo en el puerto ${configuracionEntorno.puertoBackend} (${estadoInicial.motor})\n`
       );
     });
   } catch (errorInicio) {

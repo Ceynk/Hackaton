@@ -6,8 +6,12 @@ import {
   obtenerContenidosRespaldo
 } from "./datosLocalesRespaldo";
 
-const URL_BASE_API =
+const URL_ORIGINAL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const URL_SIN_BARRA_FINAL = URL_ORIGINAL.replace(/\/+$/, "");
+const URL_BASE_API = URL_SIN_BARRA_FINAL.endsWith("/api")
+  ? URL_SIN_BARRA_FINAL
+  : `${URL_SIN_BARRA_FINAL}/api`;
 
 const PATRON_TEXTO_BUSQUEDA_SEGURO = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,-]{1,80}$/;
 
