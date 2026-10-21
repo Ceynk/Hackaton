@@ -6,7 +6,9 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const configuracionEntorno = {
   puertoBackend: Number(process.env.PUERTO_BACKEND) || 4000,
-  origenPermitidoCors: process.env.ORIGEN_PERMITIDO_CORS || "http://localhost:3000",
+  origenPermitidoCors:
+    process.env.ORIGEN_PERMITIDO_CORS ||
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001",
   modoBaseDatos: process.env.MODO_BASE_DATOS || "auto",
   baseDatos: {
     host: process.env.PGHOST || "localhost",

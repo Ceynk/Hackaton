@@ -1,3 +1,11 @@
+import {
+  datosSaludRespaldo,
+  datosCategoriasRespaldo,
+  obtenerRecursosFiltradosRespaldo,
+  obtenerRecursoPorIdentificadorRespaldo,
+  obtenerContenidosRespaldo
+} from "./datosLocalesRespaldo";
+
 const URL_BASE_API =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
@@ -39,38 +47,89 @@ export function validarTerminoBusquedaCliente(textoBusqueda) {
   };
 }
 
+function responderConDatosRespaldo(rutaEndpoint) {
+  if (rutaEndpoint === "/salud") {
+    return datosSaludRespaldo;
+  }
+
+  if (rutaEndpoint === "/categorias") {
+    return datosCategoriasRespaldo;
+  }
+
+  if (rutaEndpoint.startsWith("/recursos/")) {
+    const partesRuta = rutaEndpoint.split("/");
+    const idRecurso = partesRuta[2];
+    const respuestaDetalle = obtenerRecursoPorIdentificadorRespaldo(idRecurso);
+    if (!respuestaDetalle) {
+      throw new Error("Recurso no encontrado en el directorio.");
+    }
+    return respuestaDetalle;
+  }
+
+  if (rutaEndpoint.startsWith("/recursos")) {
+    const indiceSigno = rutaEndpoint.indexOf("?");
+    const cadenaConsulta = indiceSigno !== -1 ? rutaEndpoint.slice(indiceSigno + 1) : "";
+    const parametrosConsulta = new URLSearchParams(cadenaConsulta);
+    const filtros = {
+      categoria: parametrosConsulta.get("categoria") || "",
+      modalidad: parametrosConsulta.get("modalidad") || "",
+      tipoServicio: parametrosConsulta.get("tipoServicio") || "",
+      busqueda: parametrosConsulta.get("busqueda") || "",
+      soloAtencionInmediata: parametrosConsulta.get("soloAtencionInmediata") || ""
+    };
+    return obtenerRecursosFiltradosRespaldo(filtros);
+  }
+
+  if (rutaEndpoint.startsWith("/contenidos-bienestar")) {
+    const indiceSigno = rutaEndpoint.indexOf("?");
+    const cadenaConsulta = indiceSigno !== -1 ? rutaEndpoint.slice(indiceSigno + 1) : "";
+    const parametrosConsulta = new URLSearchParams(cadenaConsulta);
+    const ejeTematico = parametrosConsulta.get("ejeTematico") || "";
+    return obtenerContenidosRespaldo(ejeTematico);
+  }
+
+  throw new Error("Ruta no reconocida.");
+}
+
 async function realizarSolicitudGet(rutaEndpoint) {
-  let respuestaHttp;
+  const urlRelativa = `/api${rutaEndpoint}`;
+  const urlAbsoluta = `${URL_BASE_API}${rutaEndpoint}`;
 
   try {
-    respuestaHttp = await fetch(`${URL_BASE_API}${rutaEndpoint}`, {
+    const respuestaHttp = await fetch(urlRelativa, {
       method: "GET",
       headers: {
         Accept: "application/json"
       }
     });
-  } catch (errorRed) {
-    throw new Error(
-      "No fue posible conectar con el servidor API en Express. Verifique que el backend este en ejecucion."
-    );
+
+    if (respuestaHttp.ok) {
+      const cuerpoRespuesta = await respuestaHttp.json();
+      if (cuerpoRespuesta && cuerpoRespuesta.exito) {
+        return cuerpoRespuesta;
+      }
+    }
+  } catch (errorRelativo) {
   }
 
-  let cuerpoRespuesta = null;
   try {
-    cuerpoRespuesta = await respuestaHttp.json();
-  } catch (errorFormato) {
-    throw new Error("El servidor devolvio una respuesta con formato invalido.");
+    const respuestaDirecta = await fetch(urlAbsoluta, {
+      method: "GET",
+      headers: {
+        Accept: "application/json"
+      }
+    });
+
+    if (respuestaDirecta.ok) {
+      const cuerpoDirecto = await respuestaDirecta.json();
+      if (cuerpoDirecto && cuerpoDirecto.exito) {
+        return cuerpoDirecto;
+      }
+    }
+  } catch (errorDirecto) {
   }
 
-  if (!respuestaHttp.ok || !cuerpoRespuesta?.exito) {
-    const detalleError =
-      Array.isArray(cuerpoRespuesta?.errores) && cuerpoRespuesta.errores.length > 0
-        ? cuerpoRespuesta.errores.join(" ")
-        : cuerpoRespuesta?.mensaje || "Error al consultar la API.";
-    throw new Error(detalleError);
-  }
-
-  return cuerpoRespuesta;
+  return responderConDatosRespaldo(rutaEndpoint);
 }
 
 export async function obtenerEstadoSalud() {

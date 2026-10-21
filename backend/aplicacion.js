@@ -55,7 +55,15 @@ aplicacion.use(aplicarEncabezadosSeguridad);
 aplicacion.use(
   cors({
     origin(origenSolicitud, callback) {
-      if (!origenSolicitud || origenesPermitidos.includes(origenSolicitud)) {
+      if (!origenSolicitud) {
+        return callback(null, true);
+      }
+      const esOrigenLocal =
+        origenSolicitud.startsWith("http://localhost:") ||
+        origenSolicitud.startsWith("http://127.0.0.1:") ||
+        origenSolicitud === "http://localhost" ||
+        origenSolicitud === "http://127.0.0.1";
+      if (esOrigenLocal || origenesPermitidos.includes(origenSolicitud)) {
         return callback(null, true);
       }
       return callback(new Error("Origen no autorizado por la politica CORS"));
