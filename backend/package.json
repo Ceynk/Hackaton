@@ -10,12 +10,10 @@
     "test": "node --test pruebas/api.test.js"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.2.17",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pg": "^8.13.3"
-  },
-  "devDependencies": {
-    "@electric-sql/pglite": "^0.2.17"
   }
 }

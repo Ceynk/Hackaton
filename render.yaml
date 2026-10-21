@@ -21,7 +21,7 @@ services:
       - key: ORIGEN_PERMITIDO_CORS
         value: "*"
       - key: MODO_BASE_DATOS
-        value: postgres
+        value: auto
 
   - type: web
     name: mente-sana-frontend
@@ -32,6 +32,11 @@ services:
     startCommand: npm start
     envVars:
       - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: mente-sana-backend
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: BACKEND_URL
         fromService:
           type: web
           name: mente-sana-backend

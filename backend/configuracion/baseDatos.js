@@ -10,8 +10,20 @@ let motorActivo = "postgres_pool";
 let inicializacionCompletada = false;
 
 async function leerArchivoSql(nombreArchivo) {
-  const rutaArchivo = path.resolve(__dirname, "../../base_datos", nombreArchivo);
-  return fs.promises.readFile(rutaArchivo, "utf8");
+  const rutasPosibles = [
+    path.resolve(__dirname, "../base_datos", nombreArchivo),
+    path.resolve(__dirname, "../../base_datos", nombreArchivo),
+    path.resolve(process.cwd(), "base_datos", nombreArchivo),
+    path.resolve(process.cwd(), "../base_datos", nombreArchivo)
+  ];
+
+  for (const ruta of rutasPosibles) {
+    if (fs.existsSync(ruta)) {
+      return fs.promises.readFile(ruta, "utf8");
+    }
+  }
+
+  return fs.promises.readFile(rutasPosibles[0], "utf8");
 }
 
 async function obtenerMotorEmbebido() {

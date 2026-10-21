@@ -13,6 +13,7 @@ async function iniciarServidor() {
       );
     });
   } catch (errorInicio) {
+    console.error("Error detallado al inicializar el servidor:", errorInicio);
     process.stderr.write(
       "Error al inicializar el servidor o la conexion con PostgreSQL. Revise la configuracion de variables de entorno.\n"
     );

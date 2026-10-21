@@ -100,6 +100,8 @@ aplicacion.use((solicitud, respuesta) => {
 });
 
 aplicacion.use((errorCapturado, solicitud, respuesta, siguiente) => {
+  console.error("Error no controlado en backend Express:", errorCapturado);
+
   if (errorCapturado && errorCapturado.message === "Origen no autorizado por la politica CORS") {
     return respuesta.status(403).json({
       exito: false,

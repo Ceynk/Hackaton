@@ -6,12 +6,16 @@ import {
   obtenerContenidosRespaldo
 } from "./datosLocalesRespaldo";
 
-const URL_ORIGINAL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-const URL_SIN_BARRA_FINAL = URL_ORIGINAL.replace(/\/+$/, "");
-const URL_BASE_API = URL_SIN_BARRA_FINAL.endsWith("/api")
-  ? URL_SIN_BARRA_FINAL
-  : `${URL_SIN_BARRA_FINAL}/api`;
+function obtenerUrlBaseAbsoluta() {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const limpia = process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+    return limpia.endsWith("/api") ? limpia : `${limpia}/api`;
+  }
+  if (typeof window !== "undefined" && window.location.protocol === "https:") {
+    return "";
+  }
+  return "http://localhost:4000/api";
+}
 
 const PATRON_TEXTO_BUSQUEDA_SEGURO = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,-]{1,80}$/;
 
@@ -97,7 +101,7 @@ function responderConDatosRespaldo(rutaEndpoint) {
 
 async function realizarSolicitudGet(rutaEndpoint) {
   const urlRelativa = `/api${rutaEndpoint}`;
-  const urlAbsoluta = `${URL_BASE_API}${rutaEndpoint}`;
+  const urlBaseAbsoluta = obtenerUrlBaseAbsoluta();
 
   try {
     const respuestaHttp = await fetch(urlRelativa, {
@@ -116,21 +120,24 @@ async function realizarSolicitudGet(rutaEndpoint) {
   } catch (errorRelativo) {
   }
 
-  try {
-    const respuestaDirecta = await fetch(urlAbsoluta, {
-      method: "GET",
-      headers: {
-        Accept: "application/json"
-      }
-    });
+  if (urlBaseAbsoluta) {
+    try {
+      const urlAbsoluta = `${urlBaseAbsoluta}${rutaEndpoint}`;
+      const respuestaDirecta = await fetch(urlAbsoluta, {
+        method: "GET",
+        headers: {
+          Accept: "application/json"
+        }
+      });
 
-    if (respuestaDirecta.ok) {
-      const cuerpoDirecto = await respuestaDirecta.json();
-      if (cuerpoDirecto && cuerpoDirecto.exito) {
-        return cuerpoDirecto;
+      if (respuestaDirecta.ok) {
+        const cuerpoDirecto = await respuestaDirecta.json();
+        if (cuerpoDirecto && cuerpoDirecto.exito) {
+          return cuerpoDirecto;
+        }
       }
+    } catch (errorDirecto) {
     }
-  } catch (errorDirecto) {
   }
 
   return responderConDatosRespaldo(rutaEndpoint);
